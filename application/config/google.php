@@ -6,5 +6,5 @@ $config['google']['client_id'] = '496802162480-8ipf7s1ig9oop1bn9o26incjiodta1qj.
 // $config['google']['client_id'] = '';
 $config['google']['client_secret'] = 'dbJCPl1avUWRNAfl7GzkTpIT';
 // $config['google']['client_secret'] = '';
-$config['google']['redirect_uri'] = 'http://localhost/PPK2018/PPK_Control/login';
+$config['google']['redirect_uri'] = 'http://localhost/PPK2018/PPK_Control/';
 $config['google']['api_key'] = 'AIzaSyBEoWz46CU1XjDeO4JkoDyxqSJRM6AbEao';
