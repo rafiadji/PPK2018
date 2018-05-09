@@ -11,6 +11,11 @@ class PPK_Control extends CI_Controller {
 	
 	public function index()
 	{
+		if(isset($_GET['code'])){
+			$this->google->getAuthenticate();
+			$info = $this->google->getUserInfo();
+			var_dump($info);
+		}
 		$data["loginUrl"] = $this->google->loginURL();
 		$this->load->view('login',$data);
 	}
