@@ -26,8 +26,8 @@ class Google{
 		return $this->client->createAuthUrl();
 	}
 	
-	public function getAuthenticate() {
-		return $this->client->authenticate();
+	public function getAuthenticate($code = "") {
+		return $this->client->authenticate($code);
 	}
 	
 	public function getAccessToken() {
@@ -38,8 +38,8 @@ class Google{
 		return $this->client->setAccessToken();
 	}
 	
-	public function revokeToken() {
-		return $this->client->revokeToken();
+	public function revokeToken($acctoken = "") {
+		return $this->client->revokeToken($acctoken);
 	}
 	
 	public function getUserInfo() {
