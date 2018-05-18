@@ -18,7 +18,7 @@ class PPK_Control extends CI_Controller {
 			echo $this->session->userdata('acc_token');
 			if($this->session->userdata('acc_token')){
 				$info = $this->google->getUserInfo();
-				var_dump($info);
+				$this->ppk->checkUser($info);
 			}
 		}
 		$data["loginUrl"] = $this->google->loginURL();
