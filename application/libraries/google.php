@@ -1,29 +1,69 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
+require APPPATH .'third_party/google-api-php-client/Google_Client.php';
+require APPPATH .'third_party/google-api-php-client/contrib/Google_Oauth2Service.php';
+require APPPATH .'third_party/google-api-php-client/contrib/Google_DriveService.php';
+
 class Google{
+	private $CI;
+	var $sess_name;
+	var $tokens;
+	var $ready = false;
 	
 	public function __construct(){
 	
-		$CI =& get_instance();
-		$CI->config->load('google');
-		
-		require APPPATH .'third_party/google-api-php-client/Google_Client.php';
-		require APPPATH .'third_party/google-api-php-client/contrib/Google_Oauth2Service.php';
-		
+		$this->CI =& get_instance();
+		$this->CI->config->load('google');
+				
 		$this->client = new Google_Client();
-		$this->client->setApplicationName($CI->config->item('application_name', 'google'));
-		$this->client->setClientId($CI->config->item('client_id', 'google'));
-		$this->client->setClientSecret($CI->config->item('client_secret', 'google'));
-		$this->client->setRedirectUri($CI->config->item('redirect_uri', 'google'));
-		$this->client->setDeveloperKey($CI->config->item('api_key', 'google'));
-		$this->client->setScopes($CI->config->item('scopes', 'google'));
+		$this->client->setApplicationName($this->CI->config->item('application_name', 'google'));
+		$this->client->setClientId($this->CI->config->item('client_id', 'google'));
+		$this->client->setClientSecret($this->CI->config->item('client_secret', 'google'));
+		$this->client->setRedirectUri($this->CI->config->item('redirect_uri', 'google'));
+		$this->client->setDeveloperKey($this->CI->config->item('api_key', 'google'));
+		$this->client->setScopes($this->CI->config->item('scopes', 'google'));
 		$this->client->setAccessType('online');
 		$this->client->setApprovalPrompt('auto');
+		$this->client->setUseObjects(true);
 		$this->oauth2 = new Google_Oauth2Service($this->client);
+		$this->gdrive = new Google_DriveService($this->client);
+		$this->sess_name = $this->CI->config->item('sess_name', 'google');
+		
+		$this->tokens = $this->CI->session->userdata($this->sess_name);
+		
+		if($this->client->isAccessTokenExpired() && $this->tokens){
+			$token = json_decode($this->tokens);
+			$refreshToken = $token->refresh_token;
+			$this->client->refreshToken($refreshToken);
+			$this->tokens = $this->client->getAccessToken();
+		}
+		
+		if(!$this->client->isAccessTokenExpired()){
+			$this->CI->session->set_userdata($this->sess_name);
+			$this->ready = true;
+		}
+		else {
+			$this->ready = false;
+		}
 	}
 	
-	public function loginURL() {
-		return $this->client->createAuthUrl();
+	public function cekLogin($direct="") {
+		if($this->tokens){
+			$this->client->setAccessToken($this->tokens);
+		}elseif($code = $this->CI->input->get('code', TRUE)){
+			$this->client->authenticate($code);
+			$this->tokens = $this->client->getAccessToken();
+		}else{
+			return $this->client->createAuthUrl();
+		}
+	}
+	
+	public function getUser() {
+		return $this->oauth2->userinfo->get();
+	}
+	
+	public function logout() {
+		$this->CI->session->unset_userdata($this->sess_name);
 	}
 	
 	public function getAuthenticate($code = "") {
@@ -34,15 +74,16 @@ class Google{
 		return $this->client->getAccessToken();
 	}
 	
-	public function setAccessToken() {
-		return $this->client->setAccessToken();
+	public function setAccessToken($token) {
+		return $this->client->setAccessToken($token);
 	}
 	
 	public function revokeToken($acctoken = "") {
 		return $this->client->revokeToken($acctoken);
 	}
-	
-	public function getUserInfo() {
-		return $this->oauth2->userinfo->get();
+
+	public function getFile($pageToken = null, $filter = null)
+	{
+		
 	}
 }

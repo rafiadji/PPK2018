@@ -16,7 +16,7 @@ class Google_drive{
 		$this->client->setClientSecret($CI->config->item('client_secret', 'google'));
 		$this->client->setRedirectUri($CI->config->item('redirect_uri', 'google'));
 		$this->client->setDeveloperKey($CI->config->item('api_key', 'google'));
-		$this->client->setScopes(array('https://www.googleapis.com/auth/drive'));
+		$this->client->setScopes($CI->config->item('scope', 'google'));
 		$this->client->setAccessType('offline');
 		$this->client->setApprovalPrompt('auto');
 		$this->gdrive = new Google_DriveService($this->client);
