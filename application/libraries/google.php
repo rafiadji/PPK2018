@@ -31,6 +31,15 @@ class Google{
 		
 		$this->tokens = $this->CI->session->userdata($this->sess_name);
 		
+		if($this->tokens){
+			$this->client->setAccessToken($this->tokens);
+		}elseif($code = $this->CI->input->get('code', TRUE)){
+			$this->client->authenticate($code);
+			$this->tokens = $this->client->getAccessToken();
+		}else{
+			return;
+		}
+		
 		if($this->client->isAccessTokenExpired() && $this->tokens){
 			$token = json_decode($this->tokens);
 			$refreshToken = $token->refresh_token;
@@ -47,15 +56,8 @@ class Google{
 		}
 	}
 	
-	public function cekLogin($direct="") {
-		if($this->tokens){
-			$this->client->setAccessToken($this->tokens);
-		}elseif($code = $this->CI->input->get('code', TRUE)){
-			$this->client->authenticate($code);
-			$this->tokens = $this->client->getAccessToken();
-		}else{
-			return $this->client->createAuthUrl();
-		}
+	public function loginURL() {
+		return $this->client->createAuthUrl();
 	}
 	
 	public function getUser() {
@@ -82,8 +84,56 @@ class Google{
 		return $this->client->revokeToken($acctoken);
 	}
 
-	public function getFile($pageToken = null, $filter = null)
+	public function getFile($pageToken = null, $filters = null)
 	{
-		
+		try{
+			$result = array();
+			$error = array();
+			try{
+				if(!empty($filters)){
+					$where = "";
+					foreach ($filters as $i => $filter) {
+						if($i > 0){
+							$where .= " and {$filter}";
+						}else {
+							$where .= $filter;
+						}
+					}
+					$param = array(
+						"q" => $where,
+						"maxResult" => 50
+					);
+				} else {
+					$param = array(
+						"q" => "mimeType != 'application/vnd.google-apps.folder'",
+						"maxResult" => 50
+					);
+				}
+				
+				if($pageToken){
+					$param['pageToken'] = $pageToken;
+				}
+				
+				$files = $this->gdrive->files->listFiles($param);
+				$result = array_merge($result, $files->getItems());
+				$pageToken = $files->getNextPageToken();
+			}catch(Exception $ex){
+				$pageToken = null;
+				$error[] = $ex->getMessage();
+			}
+			
+			return array(
+				"success" => true,
+				"files" => $result,
+				"nextPageToken" => $pageToken,
+				"errors" => $error,
+				"param" => $param
+			);
+		}catch(Exception $ex){
+			return array(
+				"success" => false,
+				"message" => $ex->getMessage()
+			);
+		}
 	}
 }

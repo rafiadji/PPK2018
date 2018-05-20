@@ -11,17 +11,13 @@ class PPK_Control extends CI_Controller {
 	
 	public function index()
 	{
-		$data["loginUrl"] = $this->google->cekLogin();
+		$data["loginUrl"] = $this->google->loginURL();
 		$this->load->view('login',$data);
 	}
 	
 	public function logout()
 	{
-		$this->session->sess_destroy();
-		$acctoken = $this->google->getAccessToken();
-		if($acctoken != null){
-			$this->google->revokeToken($acctoken);
-		}
+		$this->google->logout();
 		redirect(base_url());
 	}
 }
