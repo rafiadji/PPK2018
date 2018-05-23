@@ -68,6 +68,16 @@ class Google{
 		$this->CI->session->unset_userdata($this->sess_name);
 	}
 	
+	public function isReady()
+	{
+		return $this->ready;
+	}
+	
+	public function sessName()
+	{
+		return $this->sess_name;
+	}
+	
 	public function getAuthenticate($code = "") {
 		return $this->client->authenticate($code);
 	}
@@ -100,13 +110,13 @@ class Google{
 						}
 					}
 					$param = array(
-						"q" => $where,
-						"maxResult" => 50
+						"q" => $where
+						// "maxResult" => 10
 					);
 				} else {
 					$param = array(
-						"q" => "mimeType != 'application/vnd.google-apps.folder'",
-						"maxResult" => 50
+						"q" => "mimeType != 'application/vnd.google-apps.folder'"
+						// "maxResult" => 10
 					);
 				}
 				
