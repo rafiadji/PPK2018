@@ -6,20 +6,23 @@ class PPK_Control extends CI_Controller {
 	public function  __construct(){
 		parent::__construct();
 		$this->load->library('google');
-		$this->load->model('PPK_Model','ppk');
+		$this->load->model('PPK_Model','ppk2018');
 	}
 	
 	public function index()
 	{
+		
 		if(isset($_GET['code'])){
 			$this->google->getAuthenticate($_GET['code']);
 			$this->session->set_userdata('acc_token', $this->google->getAccessToken());
-			// redirect("PPK_Control/dashboard");
-			echo $this->session->userdata('acc_token');
+		 redirect('welcome/dashboard/');
+			// echo $this->session->userdata('acc_token');
 			if($this->session->userdata('acc_token')){
 				$info = $this->google->getUserInfo();
-				var_dump($info);
+				$this->ppk->checkUser($info);
+
 			}
+			
 		}
 		$data["loginUrl"] = $this->google->loginURL();
 		$this->load->view('login',$data);
