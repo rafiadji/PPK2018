@@ -15,10 +15,13 @@
 <body class="hold-transition login-page">
 	<div class="login-box">
 		<div class="login-logo">
-			<a href="<?php echo base_url()?>assets/index2.html"><b>Admin</b>LTE</a>
+			<a href="<?php echo base_url()?>assets/index2.html"><b>PPK</b>2018</a>
 		</div>
-		<div class="social-auth-links text-center">
-			<a href="<?php echo $loginUrl?>" class="btn btn-block btn-social btn-google btn-flat"><i class="fa fa-google-plus"></i> Sign in using Google+</a>
+		<div class="login-box-body">
+			<p class="login-box-msg">Sign in to start your session</p>
+			<div class="social-auth-links text-center">
+				<a href="<?php echo $loginUrl?>" class="btn btn-block btn-social btn-google btn-flat"><i class="fa fa-google-plus"></i> Sign in using Google+</a>
+			</div>
 		</div>
 	</div>
 	<script src="<?php echo base_url()?>assets/bower_components/jquery/dist/jquery.min.js"></script>

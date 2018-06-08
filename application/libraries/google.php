@@ -1,13 +1,12 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-require APPPATH .'third_party/google-api-php-client/Google_Client.php';
-require APPPATH .'third_party/google-api-php-client/contrib/Google_Oauth2Service.php';
-require APPPATH .'third_party/google-api-php-client/contrib/Google_DriveService.php';
+require APPPATH .'third_party/vendor/autoload.php';
 
 class Google{
 	private $CI;
 	var $sess_name;
 	var $tokens;
+	var $gdrive;
 	var $ready = false;
 	
 	public function __construct(){
@@ -21,22 +20,24 @@ class Google{
 		$this->client->setClientSecret($this->CI->config->item('client_secret', 'google'));
 		$this->client->setRedirectUri($this->CI->config->item('redirect_uri', 'google'));
 		$this->client->setDeveloperKey($this->CI->config->item('api_key', 'google'));
-		$this->client->setScopes($this->CI->config->item('scopes', 'google'));
+		$this->client->setScopes(Google_Service_Drive::DRIVE_METADATA_READONLY);
 		$this->client->setAccessType('online');
 		$this->client->setApprovalPrompt('auto');
-		$this->client->setUseObjects(true);
-		$this->oauth2 = new Google_Oauth2Service($this->client);
-		$this->gdrive = new Google_DriveService($this->client);
+		
 		$this->sess_name = $this->CI->config->item('sess_name', 'google');
 		
-		$this->tokens = $this->CI->session->userdata($this->sess_name);
-		
+		$this->tokens = $this->CI->session->userdata('token');
+		//var_dump($this->tokens);
 		if($this->tokens){
 			$this->client->setAccessToken($this->tokens);
 		}elseif($code = $this->CI->input->get('code', TRUE)){
 			$this->client->authenticate($code);
 			$this->tokens = $this->client->getAccessToken();
-		}else{
+			$this->client->setAccessToken($this->tokens);
+			$this->CI->session->set_userdata('token', $this->tokens);
+		}
+		else
+		{
 			return;
 		}
 		
@@ -54,6 +55,7 @@ class Google{
 		else {
 			$this->ready = false;
 		}
+		
 	}
 	
 	public function loginURL() {
@@ -96,35 +98,37 @@ class Google{
 
 	public function getFile($pageToken = null, $filters = null)
 	{
-		try{
+		/* try{
+			
 			$result = array();
 			$error = array();
 			try{
-				if(!empty($filters)){
-					$where = "";
-					foreach ($filters as $i => $filter) {
-						if($i > 0){
-							$where .= " and {$filter}";
-						}else {
-							$where .= $filter;
-						}
-					}
-					$param = array(
-						"q" => $where
-						// "maxResult" => 10
-					);
-				} else {
-					$param = array(
-						"q" => "mimeType != 'application/vnd.google-apps.folder'"
-						// "maxResult" => 10
-					);
-				}
-				
-				if($pageToken){
-					$param['pageToken'] = $pageToken;
-				}
-				
+				// if(!empty($filters)){
+					// $where = "";
+					// foreach ($filters as $i => $filter) {
+						// if($i > 0){
+							// $where .= " and {$filter}";
+						// }else {
+							// $where .= $filter;
+						// }
+					// }
+					// $param = array(
+						// "q" => $where
+						// // "pageSize" => 10
+					// );
+				// } else {
+					// $param = array(
+						// "q" => "mimeType != 'application/vnd.google-apps.folder'"
+						// // "pageSize" => 10
+					// );
+				// }
+// 				
+				// if($pageToken){
+					// $param['pageToken'] = $pageToken;
+				// }
+				$param['fields'] = "nextPageToken, files(id, name)";
 				$files = $this->gdrive->files->listFiles($param);
+				var_dump($files);
 				$result = array_merge($result, $files->getItems());
 				$pageToken = $files->getNextPageToken();
 			}catch(Exception $ex){
@@ -144,6 +148,70 @@ class Google{
 				"success" => false,
 				"message" => $ex->getMessage()
 			);
-		}
+		}try{
+			$result = array();
+			$error = array();
+			try{
+				// if(!empty($filters)){
+					// $where = "";
+					// foreach ($filters as $i => $filter) {
+						// if($i > 0){
+							// $where .= " and {$filter}";
+						// }else {
+							// $where .= $filter;
+						// }
+					// }
+					// $param = array(
+						// "q" => $where
+						// // "pageSize" => 10
+					// );
+				// } else {
+					// $param = array(
+						// "q" => "mimeType != 'application/vnd.google-apps.folder'"
+						// // "pageSize" => 10
+					// );
+				// }
+// 				
+				// if($pageToken){
+					// $param['pageToken'] = $pageToken;
+				// }
+				$param['fields'] = "nextPageToken, files(id, name)";
+				$files = $this->gdrive->files->listFiles($param);
+				var_dump($files);
+				$result = array_merge($result, $files->getItems());
+				$pageToken = $files->getNextPageToken();
+			}catch(Exception $ex){
+				$pageToken = null;
+				$error[] = $ex->getMessage();
+			}
+			
+			return array(
+				"success" => true,
+				"files" => $result,
+				"nextPageToken" => $pageToken,
+				"errors" => $error,
+				"param" => $param
+			);
+		}catch(Exception $ex){
+			return array(
+				"success" => false,
+				"message" => $ex->getMessage()
+			);
+		} */
+		$this->gdrive = new Google_Service_Drive($this->client);
+		$optParams = array(
+		  'pageSize' => 10,
+		  'fields' => 'nextPageToken, files(id, name)'
+		);
+		$results = $this->gdrive->files->listFiles($optParams);
+
+		if (count($results->getFiles()) == 0) {
+			print "No files found.\n";
+		} else {
+			print "Files:\n";
+			foreach ($results->getFiles() as $file) {
+				printf("%s (%s)\n", $file->getName(), $file->getId());
+			}
+		}//print_r($files);
 	}
 }
