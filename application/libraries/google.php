@@ -27,7 +27,7 @@ class Google{
 		$this->sess_name = $this->CI->config->item('sess_name', 'google');
 		
 		$this->tokens = $this->CI->session->userdata('token');
-		//var_dump($this->tokens);
+		var_dump($this->tokens);
 		if($this->tokens){
 			$this->client->setAccessToken($this->tokens);
 		}elseif($code = $this->CI->input->get('code', TRUE)){
@@ -49,7 +49,7 @@ class Google{
 		}
 		
 		if(!$this->client->isAccessTokenExpired()){
-			$this->CI->session->set_userdata($this->sess_name);
+			$this->CI->session->set_userdata('token', $this->tokens);
 			$this->ready = true;
 		}
 		else {
@@ -67,7 +67,7 @@ class Google{
 	}
 	
 	public function logout() {
-		$this->CI->session->unset_userdata($this->sess_name);
+		$this->CI->session->unset_userdata('token');
 	}
 	
 	public function isReady()
@@ -79,139 +79,73 @@ class Google{
 	{
 		return $this->sess_name;
 	}
-	
-	public function getAuthenticate($code = "") {
-		return $this->client->authenticate($code);
-	}
-	
-	public function getAccessToken() {
-		return $this->client->getAccessToken();
-	}
-	
-	public function setAccessToken($token) {
-		return $this->client->setAccessToken($token);
-	}
-	
-	public function revokeToken($acctoken = "") {
-		return $this->client->revokeToken($acctoken);
-	}
 
 	public function getFile($pageToken = null, $filters = null)
 	{
-		/* try{
-			
-			$result = array();
-			$error = array();
-			try{
-				// if(!empty($filters)){
-					// $where = "";
-					// foreach ($filters as $i => $filter) {
-						// if($i > 0){
-							// $where .= " and {$filter}";
-						// }else {
-							// $where .= $filter;
-						// }
-					// }
-					// $param = array(
-						// "q" => $where
-						// // "pageSize" => 10
-					// );
-				// } else {
-					// $param = array(
-						// "q" => "mimeType != 'application/vnd.google-apps.folder'"
-						// // "pageSize" => 10
-					// );
-				// }
-// 				
-				// if($pageToken){
-					// $param['pageToken'] = $pageToken;
-				// }
-				$param['fields'] = "nextPageToken, files(id, name)";
-				$files = $this->gdrive->files->listFiles($param);
-				var_dump($files);
-				$result = array_merge($result, $files->getItems());
-				$pageToken = $files->getNextPageToken();
-			}catch(Exception $ex){
-				$pageToken = null;
-				$error[] = $ex->getMessage();
-			}
-			
-			return array(
-				"success" => true,
-				"files" => $result,
-				"nextPageToken" => $pageToken,
-				"errors" => $error,
-				"param" => $param
-			);
-		}catch(Exception $ex){
-			return array(
-				"success" => false,
-				"message" => $ex->getMessage()
-			);
-		}try{
-			$result = array();
-			$error = array();
-			try{
-				// if(!empty($filters)){
-					// $where = "";
-					// foreach ($filters as $i => $filter) {
-						// if($i > 0){
-							// $where .= " and {$filter}";
-						// }else {
-							// $where .= $filter;
-						// }
-					// }
-					// $param = array(
-						// "q" => $where
-						// // "pageSize" => 10
-					// );
-				// } else {
-					// $param = array(
-						// "q" => "mimeType != 'application/vnd.google-apps.folder'"
-						// // "pageSize" => 10
-					// );
-				// }
-// 				
-				// if($pageToken){
-					// $param['pageToken'] = $pageToken;
-				// }
-				$param['fields'] = "nextPageToken, files(id, name)";
-				$files = $this->gdrive->files->listFiles($param);
-				var_dump($files);
-				$result = array_merge($result, $files->getItems());
-				$pageToken = $files->getNextPageToken();
-			}catch(Exception $ex){
-				$pageToken = null;
-				$error[] = $ex->getMessage();
-			}
-			
-			return array(
-				"success" => true,
-				"files" => $result,
-				"nextPageToken" => $pageToken,
-				"errors" => $error,
-				"param" => $param
-			);
-		}catch(Exception $ex){
-			return array(
-				"success" => false,
-				"message" => $ex->getMessage()
-			);
-		} */
 		$this->gdrive = new Google_Service_Drive($this->client);
-		$optParams = array(
-		  'pageSize' => 10,
-		  'fields' => 'nextPageToken, files(id, name)'
-		);
-		$results = $this->gdrive->files->listFiles($optParams);
-
-		if (count($results->getFiles()) == 0) {
-			print "No files found.\n";
-		} else {
-			print "Files:\n";
-			foreach ($results->getFiles() as $file) {
-				printf("%s (%s)\n", $file->getName(), $file->getId());
+		try{
+			$result = array();
+			$error = array();
+			try{
+				if(!empty($filters)){
+					$where = "";
+					foreach ($filters as $i => $filter) {
+						if($i > 0){
+							$where .= " and {$filter}";
+						}else {
+							$where .= $filter;
+						}
+					}
+					$param = array(
+						"q" => $where
+						// "pageSize" => 10
+					);
+				} else {
+					$param = array(
+						"q" => "mimeType != 'application/vnd.google-apps.folder'"
+						// "pageSize" => 10
+					);
+				}
+				if($pageToken){
+					$param['pageToken'] = $pageToken;
+				}
+				$param['fields'] = "nextPageToken, files(id, name)";
+				$files = $this->gdrive->files->listFiles($param);
+				$result = array_merge($result, $files->getFiles());
+				$pageToken = $files->getNextPageToken();
+			}catch(Exception $ex){
+				$pageToken = null;
+				$error[] = $ex->getMessage();
 			}
-		}//print_r($files);
+			
+			return array(
+				"success" => true,
+				"files" => $result,
+				"nextPageToken" => $pageToken,
+				"errors" => $error,
+				"param" => $param
+			);
+		}catch(Exception $ex){
+			return array(
+				"success" => false,
+				"message" => $ex->getMessage()
+			);
+		}
+		// $this->gdrive = new Google_Service_Drive($this->client);
+		// $optParams = array(
+		  // 'pageSize' => 10,
+		  // 'fields' => 'nextPageToken, files(id, name)'
+		// );
+		// $results = $this->gdrive->files->listFiles($optParams);
+// 
+		// if (count($results->getFiles()) == 0) {
+			// print "No files found.\n";
+		// } else {
+			// print "Files:\n";
+			// foreach ($results->getFiles() as $file) {
+				// printf("%s (%s)\n", $file->getName(), $file->getId());
+			// }
+			// print $results->getNextPageToken();
+		// }
 	}
 }

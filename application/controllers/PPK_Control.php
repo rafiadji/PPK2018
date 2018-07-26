@@ -18,11 +18,12 @@ class PPK_Control extends CI_Controller {
 		$this->load->view('login',$data);
 	}
 	
-	public function dashboard()
+	public function dashboard($pagetoken = NULL)
 	{
-		$file = $this->google->getFile();
-		var_dump($file);
-		// $data["file"] = $file->files;
+		$file = $this->google->getFile($pagetoken);
+		$data["file"] = $file["files"];
+		$data["pagetoken"] = $file["nextPageToken"];
+		var_dump($file["errors"]);
 		$this->load->view('dashboard', $data);
 	}
 	
