@@ -42,19 +42,16 @@
       <h4><img src="<?php echo @$userData['picture_url']; ?>" width="100" height="100"/></h4>
       <div class="input-group">
        <h4 style="font-family: sans-serif;"><?php echo @$userData['first_name'].' '.@$userData['last_name']; ?> </h4>
-       <p> <a href="<?php echo base_url().'index.php/welcome/logout'; ?>">LogOut</a></p>
+
+        <ul class="nav nav-pills nav-stacked">
+        <li ><a href="<?php echo base_url().'index.php/PPK_Control/formupload'; ?>">Upload File</a></li>
+        <li><a href="<?php echo base_url().'index.php/welcome/logout'; ?>">LogOut</a></li>
+      </ul><br>
       </div>
     </div>
 
     <div class="col-sm-9">
-      <a style="margin-top: 10px;" href="#" class="btn btn-info btn-lg">
-          <span class="glyphicon glyphicon-cloud-upload"></span> Upload
-        </a>
- <a style="margin-top: 10px;" href="#" class="btn btn-info btn-lg">
-          <span class="glyphicon glyphicon-download"></span> Download
-        </a>
-           
-    
+   
   </div>
 </div>
 

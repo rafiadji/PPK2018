@@ -20,7 +20,10 @@ class Google{
 		$this->client->setClientSecret($this->CI->config->item('client_secret', 'google'));
 		$this->client->setRedirectUri($this->CI->config->item('redirect_uri', 'google'));
 		$this->client->setDeveloperKey($this->CI->config->item('api_key', 'google'));
-		$this->client->setScopes(Google_Service_Drive::DRIVE_METADATA_READONLY);
+		$this->client->setScopes(array(
+			Google_Service_Drive::DRIVE_FILE,
+			Google_Service_Drive::DRIVE_METADATA
+		));
 		$this->client->setAccessType('online');
 		$this->client->setApprovalPrompt('auto');
 		
@@ -214,4 +217,31 @@ class Google{
 			}
 		}//print_r($files);
 	}
+
+	public function uploadFile($uploaddata)
+	{
+		// code buat upload file ke assets
+
+		
+
+			//jika file berhasil diupload isi nama file dan mime file
+		$alamat_file = $uploaddata['full_path'];
+		$nama_file = $uploaddata['file_name'];
+		$mime_file = $uploaddata['file_type'];
+		// upload file ke google drive
+		$this->gdrive = new Google_Service_Drive($this->client);
+		$fileMetadata = new Google_Service_Drive_DriveFile(array('name' => $nama_file));
+		$content = file_get_contents($alamat_file);
+		$file = $this->gdrive->files->create($fileMetadata, array(
+		    'data' => $content,
+		    'mimeType' => $mime_file,
+		    'uploadType' => 'multipart',
+		    'fields' => 'id'));
+		printf("File ID: %s\n", $file->id);
+
+		// jika file berhasil diupload, hapus file di assets
+		}
+	
+		
+		
 }
