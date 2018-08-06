@@ -45,6 +45,7 @@
 
         <ul class="nav nav-pills nav-stacked">
         <li ><a href="<?php echo base_url().'index.php/PPK_Control/formupload'; ?>">Upload File</a></li>
+          <li ><a href="<?php echo base_url().'index.php/PPK_Control/download'; ?>">Download File</a></li>
         <li><a href="<?php echo base_url().'index.php/welcome/logout'; ?>">LogOut</a></li>
       </ul><br>
       </div>

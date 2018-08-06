@@ -8,6 +8,7 @@ class PPK_Control extends CI_Controller {
 		$this->load->library('google');
 		$this->load->model('PPK_Model','ppk2018');
 		$this->load->helper(array('form', 'url'));
+		$this->load->helper(array('download', 'url'));
 	}
 	
 	public function index(){
@@ -39,6 +40,12 @@ class PPK_Control extends CI_Controller {
 			print_r($res);die;
 			// $this->load->view('upload');
 		}
+	}
+
+	public function download(){
+		 force_download($this->google->DownloadFile());
+		
+		
 	}
 	
 	public function dashboard()

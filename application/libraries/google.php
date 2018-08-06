@@ -241,6 +241,19 @@ class Google{
 
 		// jika file berhasil diupload, hapus file di assets
 		}
+
+		public function DownloadFile(){
+			$fileId = '1mwNCwrU0thGmrQ9fxpwS2pJV-Rl7oJFj';
+			$this->gdrive = new Google_Service_Drive($this->client);
+			$response = $this->gdrive->files->get($fileId, array(
+   			 'alt' => 'media'));
+			$content = $response->getBody()->getContents();
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename=tes.docx'); 
+			echo $content;
+			//print_r($content = $response->getBody()->getContents());
+		}
 	
 		
 		
