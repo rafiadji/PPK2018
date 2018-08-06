@@ -27,7 +27,7 @@ class Google{
 		$this->sess_name = $this->CI->config->item('sess_name', 'google');
 		
 		$this->tokens = $this->CI->session->userdata('token');
-		var_dump($this->tokens);
+		// var_dump($this->tokens);
 		if($this->tokens){
 			$this->client->setAccessToken($this->tokens);
 		}elseif($code = $this->CI->input->get('code', TRUE)){
@@ -55,7 +55,6 @@ class Google{
 		else {
 			$this->ready = false;
 		}
-		
 	}
 	
 	public function loginURL() {
@@ -147,5 +146,24 @@ class Google{
 			// }
 			// print $results->getNextPageToken();
 		// }
+	}
+
+	public function downloadFile($fileid)
+	{
+		$this->gdrive = new Google_Service_Drive($this->client);
+		$response = $this->gdrive->files->get($fileid, array('alt' => 'media'));
+		$content = $response->getBody()->getContents();
+	}
+
+	public function deleteFile($fileId)
+	{
+		$this->gdrive = new Google_Service_Drive($this->client);
+		$a = new Google_Service_Drive_DriveFile($this->client);
+		try{
+			return $this->gdrive->files->update($fileId, $a, array("trashed" => true));
+		}catch(Exception $e){
+			echo $e->getMessage();
+		}
+		return NULL;
 	}
 }

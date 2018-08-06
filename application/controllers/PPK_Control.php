@@ -20,11 +20,21 @@ class PPK_Control extends CI_Controller {
 	
 	public function dashboard($pagetoken = NULL)
 	{
+		$data['page'] = "daftarFile";
 		$file = $this->google->getFile($pagetoken);
 		$data["file"] = $file["files"];
 		$data["pagetoken"] = $file["nextPageToken"];
-		var_dump($file["errors"]);
 		$this->load->view('dashboard', $data);
+	}
+	
+	public function download($fileID)
+	{
+		$this->google->downloadFile($fileID);
+	}
+	
+	public function delete($fileID)
+	{
+		$this->google->deleteFile($fileID);
 	}
 	
 	public function logout()
