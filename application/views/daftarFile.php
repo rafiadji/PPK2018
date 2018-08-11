@@ -3,13 +3,7 @@
 		<h3 class="box-title">Upload File</h3>
 	</div>
 	<div class="box-body">
-		<form class="form-horizontal" action="<?php echo base_url()?>welcome/submitUpload" method="post" enctype="multipart/form-data">
-			<div class="form-group">
-				<label class="control-label col-md-1">Nama File</label>
-				<div class="col-md-5">
-					<input type="text" name="nama" class="form-control"/>
-				</div>
-			</div>
+		<form class="form-horizontal" action="<?php echo base_url()?>PPK_Control/upload" method="post" enctype="multipart/form-data">
 			<div class="form-group">
 				<label class="control-label col-md-1">File</label>
 				<div class="col-md-5">

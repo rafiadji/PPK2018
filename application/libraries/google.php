@@ -130,29 +130,37 @@ class Google{
 				"message" => $ex->getMessage()
 			);
 		}
-		// $this->gdrive = new Google_Service_Drive($this->client);
-		// $optParams = array(
-		  // 'pageSize' => 10,
-		  // 'fields' => 'nextPageToken, files(id, name)'
-		// );
-		// $results = $this->gdrive->files->listFiles($optParams);
-// 
-		// if (count($results->getFiles()) == 0) {
-			// print "No files found.\n";
-		// } else {
-			// print "Files:\n";
-			// foreach ($results->getFiles() as $file) {
-				// printf("%s (%s)\n", $file->getName(), $file->getId());
-			// }
-			// print $results->getNextPageToken();
-		// }
 	}
 
-	public function downloadFile($fileid)
+	public function uploadFile($uploaddata)
+	{
+		// code buat upload file ke assets
+		//jika file berhasil diupload isi nama file dan mime file
+		$alamat_file = $uploaddata['full_path'];
+		$nama_file = $uploaddata['file_name'];
+		$mime_file = $uploaddata['file_type'];
+		// upload file ke google drive
+		$this->gdrive = new Google_Service_Drive($this->client);
+		$fileMetadata = new Google_Service_Drive_DriveFile(array('name' => $nama_file));
+		$content = file_get_contents($alamat_file);
+		$file = $this->gdrive->files->create($fileMetadata, array(
+		    'data' => $content,
+		    'mimeType' => $mime_file,
+		    'uploadType' => 'multipart',
+		    'fields' => 'id'));
+		printf("File ID: %s\n", $file->id);
+		// jika file berhasil diupload, hapus file di assets
+	}
+
+	public function DownloadFile($fileid)
 	{
 		$this->gdrive = new Google_Service_Drive($this->client);
 		$response = $this->gdrive->files->get($fileid, array('alt' => 'media'));
 		$content = $response->getBody()->getContents();
+		header('Content-Description: File Transfer');
+		header('Content-Type: application/octet-stream');
+		header('Content-Disposition: attachment; filename=tes.docx'); 
+		echo $content;
 	}
 
 	public function deleteFile($fileId)

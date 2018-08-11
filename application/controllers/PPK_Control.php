@@ -7,6 +7,7 @@ class PPK_Control extends CI_Controller {
 		parent::__construct();
 		$this->load->library('google');
 		$this->load->model('PPK_Model','ppk');
+		$this->load->helper(array('form', 'url', 'download'));
 	}
 	
 	public function index()
@@ -26,10 +27,30 @@ class PPK_Control extends CI_Controller {
 		$data["pagetoken"] = $file["nextPageToken"];
 		$this->load->view('dashboard', $data);
 	}
+
+	public function upload(){
+    	$config['upload_path']          = 'assets/file/';
+		$config['allowed_types']        = 'gif|jpg|png|docx|pdf';
+		$config['max_size']             = 1000;
+		$config['max_width']            = 1024;
+		$config['max_height']           = 768;
+ 
+		$this->load->library('upload', $config);
+		if ( ! $this->upload->do_upload('file')){
+			$error = array('error' => $this->upload->display_errors());
+			// $this->load->view('form', $error);
+		}else{
+			$data = $this->upload->data();
+			// $this->load->view('form', $data);
+			$res = $this->google->uploadFile($data);
+			print_r($res);die;
+			// $this->load->view('upload');
+		}
+	}
 	
 	public function download($fileID)
 	{
-		$this->google->downloadFile($fileID);
+		force_download($this->google->downloadFile($fileID));
 	}
 	
 	public function delete($fileID)
