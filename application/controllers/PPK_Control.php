@@ -6,12 +6,15 @@ class PPK_Control extends CI_Controller {
 	public function  __construct(){
 		parent::__construct();
 		$this->load->library('google');
+<<<<<<< HEAD
 		$this->load->model('PPK_Model','ppk');
 		$this->load->helper(array('form', 'url', 'download'));
+=======
+		$this->load->model('PPK_Model','ppk2018');
+>>>>>>> da9c47dfb43756b6419813b1a93f191d0923b097
 	}
 	
 	public function index()
-	{
 		if($this->google->isReady()){
 			redirect("PPK_Control/dashboard");
 		}
