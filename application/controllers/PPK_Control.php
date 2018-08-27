@@ -8,10 +8,9 @@ class PPK_Control extends CI_Controller {
 		$this->load->library('google');
 		$this->load->model('PPK_Model','ppk');
 		$this->load->helper(array('form', 'url', 'download'));
-
 	}
 	
-	public function index()
+	public function index(){
 		if($this->google->isReady()){
 			redirect("PPK_Control/dashboard");
 		}
