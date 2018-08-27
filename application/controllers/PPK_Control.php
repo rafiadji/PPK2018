@@ -52,11 +52,6 @@ class PPK_Control extends CI_Controller {
 		force_download($this->google->downloadFile($fileID));
 	}
 	
-	public function delete($fileID)
-	{
-		$this->google->deleteFile($fileID);
-	}
-	
 	public function logout()
 	{
 		$this->google->logout();
