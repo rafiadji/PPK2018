@@ -20,7 +20,12 @@ class Google{
 		$this->client->setClientSecret($this->CI->config->item('client_secret', 'google'));
 		$this->client->setRedirectUri($this->CI->config->item('redirect_uri', 'google'));
 		$this->client->setDeveloperKey($this->CI->config->item('api_key', 'google'));
-		$this->client->setScopes(Google_Service_Drive::DRIVE_METADATA_READONLY);
+		$this->client->setScopes(array(
+			Google_Service_Drive::DRIVE,
+			Google_Service_Drive::DRIVE_APPDATA,
+			Google_Service_Drive::DRIVE_FILE,
+			Google_Service_Drive::DRIVE_METADATA
+		));
 		$this->client->setAccessType('online');
 		$this->client->setApprovalPrompt('auto');
 		
@@ -134,12 +139,9 @@ class Google{
 
 	public function uploadFile($uploaddata)
 	{
-		// code buat upload file ke assets
-		//jika file berhasil diupload isi nama file dan mime file
 		$alamat_file = $uploaddata['full_path'];
 		$nama_file = $uploaddata['file_name'];
 		$mime_file = $uploaddata['file_type'];
-		// upload file ke google drive
 		$this->gdrive = new Google_Service_Drive($this->client);
 		$fileMetadata = new Google_Service_Drive_DriveFile(array('name' => $nama_file));
 		$content = file_get_contents($alamat_file);
@@ -148,18 +150,16 @@ class Google{
 		    'mimeType' => $mime_file,
 		    'uploadType' => 'multipart',
 		    'fields' => 'id'));
-		printf("File ID: %s\n", $file->id);
-		// jika file berhasil diupload, hapus file di assets
 	}
 
-	public function DownloadFile($fileid)
+	public function downloadFile($fileid, $filename)
 	{
 		$this->gdrive = new Google_Service_Drive($this->client);
 		$response = $this->gdrive->files->get($fileid, array('alt' => 'media'));
 		$content = $response->getBody()->getContents();
 		header('Content-Description: File Transfer');
 		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename=tes.docx'); 
+		header('Content-Disposition: attachment; filename='.$filename); 
 		echo $content;
 	}
 
@@ -168,10 +168,11 @@ class Google{
 		$this->gdrive = new Google_Service_Drive($this->client);
 		$a = new Google_Service_Drive_DriveFile($this->client);
 		try{
-			return $this->gdrive->files->update($fileId, $a, array("trashed" => true));
+			$this->gdrive->files->delete($fileId);
+			return true;
 		}catch(Exception $e){
 			echo $e->getMessage();
 		}
-		return NULL;
+		return false;
 	}
 }

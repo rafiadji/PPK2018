@@ -8,9 +8,10 @@
 					<i class="fa fa-bars"></i>
 					</button>
 				</div>
-				<div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+				<div class="collapse navbar-collapse pull-right" id="navbar-collapse">
 					<ul class="nav navbar-nav">
 						<!-- Menu -->
+						<a href="<?php echo base_url()."/PPK_Control/logout"?>" class="navbar-brand">Logout</a>
 					</ul>
 				</div>
 			</div>

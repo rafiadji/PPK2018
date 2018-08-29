@@ -32,7 +32,8 @@
 			<?php foreach($file as $row):?>
 				<tr>
 					<td><?php echo $row->name?></td>
-					<td><a href="<?php echo base_url()?>PPK_Control/download/<?php echo $row->id?>" class="btn btn-success">Download</a></td>
+					<td><a href="<?php echo base_url()?>PPK_Control/download/<?php echo $row->id?>/<?php echo $row->name?>" class="btn btn-success">Download</a>
+					<a href="<?php echo base_url()?>PPK_Control/delete/<?php echo $row->id?>?>" onclick="return confirm('Apakah ingin menghapus data ini ?')" class="btn btn-danger">Hapus</a></td>
 				</tr>
 			<?php endforeach;?>	
 			</tbody>
